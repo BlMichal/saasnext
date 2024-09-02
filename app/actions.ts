@@ -7,7 +7,7 @@ import { siteSchema } from "./utlis/zodSchemas"
 import prisma from "./utlis/db";
 
 
-export async function CreateSiteAction(formData: FormData) {
+export async function CreateSiteAction(prevState: any, formData: FormData) {
     const { getUser } = getKindeServerSession()
 
     const user = await getUser()
@@ -23,12 +23,13 @@ export async function CreateSiteAction(formData: FormData) {
     if (submission.status !== 'success') {
         return submission.reply();
     }
+
     const response = await prisma.site.create({
         data: {
             name: submission.value.name,
             subdirectory: submission.value.subdirectory,
             description: submission.value.description,
-            userId: user.id,
+            userId: user.id
         },
     });
 
