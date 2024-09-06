@@ -1,21 +1,25 @@
 import prisma from "@/app/utlis/db";
+import { requireUser } from "@/app/utlis/requireUser";
 import { Button } from "@/components/ui/button";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { Book, FileIcon, Plus, Settings } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-async function getData(userId: string, sideId: string) {
+
+async function getData(userId: string, siteId: string) {
   const data = await prisma.article.findMany({
     where: {
       userId: userId,
-      siteId: sideId,
+      siteId: siteId,
     },
     select: {
       image: true,
+      slug:true,
+      description: true,
       title: true,
       createdAt: true,
       id: true,
+      
     },
     orderBy: {
       createdAt: "desc",
@@ -24,17 +28,13 @@ async function getData(userId: string, sideId: string) {
   return data;
 }
 
-export default async function SideIdRoute({
+export default async function SiteIdRoute({
   params,
 }: {
   params: { id: string };
 }) {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
-
-  if (!user) {
-    return redirect("api/auth/login");
-  }
+ 
+  const user = await requireUser();
 
   const data = await getData(user.id, params.id);
 
@@ -61,7 +61,7 @@ export default async function SideIdRoute({
         </Button>
       </div>
       {!data === undefined || data.length !== 0 ? <>{data.map((item)=>(
-        <div key={''}></div>
+        <div key={item.id}>{item.title}<Image src={item.image} width={250} height={250} alt="r" className="object-contain" /></div>
       ))}</> :  <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-8 text-center animate-in fade-in-50">
       <div className="flex size-20 items-center justify-center rounded-full bg-primary/10">
         <FileIcon className="size-10 text-primary" />

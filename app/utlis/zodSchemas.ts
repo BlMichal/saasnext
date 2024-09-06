@@ -6,8 +6,10 @@ export const siteSchema = z.object({
     description: z.string().min(1).max(155),    
 });
 
-export const ArticleSchema= z.object({
+export const articleSchema= z.object({
     title: z.string().min(1).max(100),
     slug: z.string().min(1).max(200),
-    image: z.string().min(1).max(40),
-    description: z.string().min(1).max(155), });
+    image: z.string().min(1),
+    description: z.string().min(1).max(200), 
+    articleContent: z.string().min(1)
+});
