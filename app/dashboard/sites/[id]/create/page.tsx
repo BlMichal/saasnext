@@ -25,6 +25,7 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "sonner";
 import slugify from "react-slugify";
+import SubmitButton from "@/app/components/SubmitButton";
 
 export default function ArticleCreationRoute({
   params,
@@ -170,7 +171,7 @@ export default function ArticleCreationRoute({
                 {fields.articleContent.errors}
               </p>
             </div>
-            <Button className="w-fit">Submit</Button>
+            <SubmitButton text="Create Article" />
           </form>
         </CardContent>
       </Card>

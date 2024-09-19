@@ -5,7 +5,6 @@ import { Book, FileIcon, Plus, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-
 async function getData(userId: string, siteId: string) {
   const data = await prisma.article.findMany({
     where: {
@@ -14,12 +13,11 @@ async function getData(userId: string, siteId: string) {
     },
     select: {
       image: true,
-      slug:true,
+      slug: true,
       description: true,
       title: true,
       createdAt: true,
       id: true,
-      
     },
     orderBy: {
       createdAt: "desc",
@@ -33,7 +31,6 @@ export default async function SiteIdRoute({
 }: {
   params: { id: string };
 }) {
- 
   const user = await requireUser();
 
   const data = await getData(user.id, params.id);
@@ -60,16 +57,31 @@ export default async function SiteIdRoute({
           </Link>
         </Button>
       </div>
-      {!data === undefined || data.length !== 0 ? <>{data.map((item)=>(
-        <div key={item.id}>{item.title}<Image src={item.image} width={250} height={250} alt="r" className="object-contain" /></div>
-      ))}</> :  <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-8 text-center animate-in fade-in-50">
-      <div className="flex size-20 items-center justify-center rounded-full bg-primary/10">
-        <FileIcon className="size-10 text-primary" />
-      </div>
-      <h2 className="mt-6 text-xl font-semibold">
-        Nemáte vytvořené žádné articly
-      </h2>
-    </div>}
+      {!data === undefined || data.length !== 0 ? (
+        <>
+          {data.map((item) => (
+            <div key={item.id}>
+              {item.title}
+              <Image
+                src={item.image}
+                width={250}
+                height={250}
+                alt="r"
+                className="object-contain"
+              />
+            </div>
+          ))}
+        </>
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-8 text-center animate-in fade-in-50">
+          <div className="flex size-20 items-center justify-center rounded-full bg-primary/10">
+            <FileIcon className="size-10 text-primary" />
+          </div>
+          <h2 className="mt-6 text-xl font-semibold">
+            Nemáte vytvořené žádné articly
+          </h2>
+        </div>
+      )}
     </>
   );
 }
