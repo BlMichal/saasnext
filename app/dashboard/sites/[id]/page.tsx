@@ -1,7 +1,31 @@
 import prisma from "@/app/utlis/db";
 import { requireUser } from "@/app/utlis/requireUser";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Book, FileIcon, Plus, Settings } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Book, FileIcon, MoreHorizontal, Plus, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -59,18 +83,79 @@ export default async function SiteIdRoute({
       </div>
       {!data === undefined || data.length !== 0 ? (
         <>
-          {data.map((item) => (
-            <div key={item.id}>
-              {item.title}
-              <Image
-                src={item.image}
-                width={250}
-                height={250}
-                alt="r"
-                className="object-contain"
-              />
-            </div>
-          ))}
+          <Card>
+            <CardHeader>
+              <CardTitle>Articles</CardTitle>
+              <CardDescription>Manage your articles</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Image</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Create at</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.map((item) => (
+                    <>
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          <Image
+                            src={item.image}
+                            width={64}
+                            height={64}
+                            alt="Article cover image"
+                            className="size-16 object-contain rounded-md"
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {item.title}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={"outline"}
+                            className="bg-green-500/10 text-green-500"
+                          >
+                            Published
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Intl.DateTimeFormat("cs", {
+                            dateStyle: "medium",
+                          }).format(item.createdAt)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size="icon">
+                                <MoreHorizontal className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Action</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem asChild>
+                                <Link
+                                  href={`/dashboard/sites/${params.id}/${item.id}`}
+                                >
+                                  Edit
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>Delete</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    </>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-8 text-center animate-in fade-in-50">

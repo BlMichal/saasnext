@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider  = "postgresql"
@@ -10,48 +8,40 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
-  id           String @id @unique
+  id           String    @id @unique
   email        String
   firstName    String
   profileImage String
-
-  createdAt DateTime @default(now())
-
-  Site    Site[]
-  Article Article[]
+  createdAt    DateTime  @default(now())
+  Article      Article[]
+  Site         Site[]
 }
 
 model Site {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   name         String
   description  String
   imageUrl     String?
-  subdirectory String   @unique
-  createdAt    DateTime @default(now())
-  updateAt     DateTime @updatedAt
-
-  User    User?     @relation(fields: [userId], references: [id])
-  userId  String?
-  Article Article[]
+  subdirectory String    @unique
+  createdAt    DateTime  @default(now())
+  updateAt     DateTime  @updatedAt
+  userId       String?
+  Article      Article[]
+  User         User?     @relation(fields: [userId], references: [id])
 }
 
 model Article {
-  id             String @id @default(uuid())
+  id             String   @id @default(uuid())
   title          String
   articleContent Json
   description    String
   image          String
-  slug           String @unique
-
-  createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
-  User      User?    @relation(fields: [userId], references: [id])
-  userId    String?
-  Site      Site?    @relation(fields: [siteId], references: [id])
-  siteId    String?
+  slug           String   @unique
+  createdAt      DateTime @default(now())
+  updateAt       DateTime @updatedAt
+  userId         String?
+  siteId         String?
+  Site           Site?    @relation(fields: [siteId], references: [id])
+  User           User?    @relation(fields: [userId], references: [id])
 }
