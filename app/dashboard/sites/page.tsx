@@ -47,6 +47,8 @@ export default async function SitesPage() {
               <Image
                 src={item.imageUrl ?? DefaultImage}
                 alt={item.name}
+                width={300}
+                height={300}
                 className="rounded-t-lg object-cover w-full aspect-auto"
               />
               <CardHeader>

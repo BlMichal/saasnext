@@ -1,4 +1,5 @@
 'use client'
+
 import { UploadDropzone } from "@/app/utlis/uploadthing";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,7 +18,7 @@ import { useFormState } from "react-dom";
 import { parseWithZod } from "@conform-to/zod";
 import { articleSchema } from "@/app/utlis/zodSchemas";
 import slugify from "react-slugify";
-import { CreateArticleActions } from "@/app/actions";
+import { EditArticleActions } from "@/app/actions";
 
  
 interface iAppProps {
@@ -29,16 +30,17 @@ interface iAppProps {
     image: string;
     slug: string;
     }
+    siteId:string
 }
 
-export function EditArticleForm({data}:iAppProps) {
+export function EditArticleForm({data, siteId}:iAppProps) {
 
     const [value, setValue] = useState<JSONContent | undefined>(data.articleContent);
     const [imagePreview, setImagePreview] = useState<undefined | string>(data.image);
     const [slugValue, setSlugValue]= useState<undefined | string>(data.slug);
     const [titleValue, setTitleValue] = useState<undefined | string>(data.title);
     
-    const [lastResult, action] = useFormState(CreateArticleActions, undefined);
+    const [lastResult, action] = useFormState(EditArticleActions, undefined);
     const [form, fields] = useForm({
       lastResult,
       onValidate({ formData }) {
@@ -73,7 +75,9 @@ export function EditArticleForm({data}:iAppProps) {
             onSubmit={form.onSubmit}
             action={action}
             className="flex flex-col gap-6"            
-          >            
+          >  
+            <input type="hidden" name="articleId" value={data.id} />          
+            <input type="hidden" name="siteId" value={siteId} />          
             <div className="grid gap-2">
               <Label>Title</Label>
               <Input
@@ -162,7 +166,7 @@ export function EditArticleForm({data}:iAppProps) {
                 {fields.articleContent.errors}
               </p>
             </div>
-            <SubmitButton text="Create Article" />
+            <SubmitButton text="Uložit" />
           </form>
         </CardContent>
       </Card>

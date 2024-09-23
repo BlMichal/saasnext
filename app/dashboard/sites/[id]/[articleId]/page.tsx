@@ -8,10 +8,10 @@ import { notFound } from "next/navigation";
 
 
 
-async function getData(postId:string) {
+async function getData(id:string) {
     const data = await prisma.article.findUnique({
         where: {
-            id: postId,    
+            id: id,    
         },
         select: {
             image:true,
@@ -40,7 +40,7 @@ export default async function EditRoute({params}:{params:{articleId: string, id:
             </Button>
             <h1 className="pl-2 text-xl">Edit Article</h1>
         </div>
-        <EditArticleForm data={data}/>
+        <EditArticleForm data={data} siteId={params.id}/>
     </div>
   )
 }

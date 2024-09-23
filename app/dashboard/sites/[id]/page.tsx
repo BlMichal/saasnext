@@ -69,7 +69,7 @@ export default async function SiteIdRoute({
           </Link>
         </Button>
         <Button asChild>
-          <Link href={"/"}>
+          <Link href={`/dashboard/sites/${params.id}/settings`}>
             <Settings className="size-6 mr-2" />
             Settings
           </Link>
@@ -145,7 +145,13 @@ export default async function SiteIdRoute({
                                   Edit
                                 </Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem>Delete</DropdownMenuItem>
+                              <DropdownMenuItem asChild> 
+                                <Link
+                                  href={`/dashboard/sites/${params.id}/${item.id}/delete`}
+                                >
+                                  Delete
+                                </Link>
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
