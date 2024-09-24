@@ -52,6 +52,7 @@ export function EditArticleForm({data, siteId}:iAppProps) {
 
     
   function handleSlugGeneration() {
+    
     const titleInput = titleValue;
 
     if (titleInput?.length === 0 || titleInput === undefined) {

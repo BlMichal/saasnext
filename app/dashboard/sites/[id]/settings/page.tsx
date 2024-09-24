@@ -1,3 +1,4 @@
+import { DeleteSite } from '@/app/actions'
 import UploadImageForm from '@/app/components/forms/UploadImageForm'
 import SubmitButton from '@/app/components/SubmitButton'
 import { Button } from '@/components/ui/button'
@@ -30,7 +31,10 @@ export default function SettingsRoute({params}:{params :{id:string}}) {
             </CardDescription>
         </CardHeader>
         <CardFooter>
+            <form action={DeleteSite}>
+                <input type="hidden" name='id' value={params.id}/>
             <SubmitButton text='Delete' variant={'destructive'}></SubmitButton>
+            </form>
         </CardFooter>
     </Card>
     </>

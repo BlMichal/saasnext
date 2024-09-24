@@ -1,6 +1,7 @@
 'use client'
 
 import { CreateSiteAction } from '@/app/actions'
+import SubmitButton from '@/app/components/SubmitButton'
 import { siteSchema } from '@/app/utlis/zodSchemas'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -47,12 +48,11 @@ export default function CreateNewSites() {
                         <Label>Description</Label>
                         <Textarea name={fields.description.name} key={fields.description.key} defaultValue={fields.description.initialValue} placeholder='Popis pro vaši stránku'/>
                         <p className='text-red-500 text-sm'>{fields.description.errors}</p>
-                    </div>
-                   
+                    </div>                   
                 </div>
             </CardContent>
             <CardFooter>
-                <Button>Uložit</Button>
+                <SubmitButton text='Uložit' />
             </CardFooter>
       </form>
         </Card>

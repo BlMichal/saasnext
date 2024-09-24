@@ -1,3 +1,4 @@
+import EmptyHeaderState from "@/app/components/EmptyHeaderState";
 import prisma from "@/app/utlis/db";
 import { requireUser } from "@/app/utlis/requireUser";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Book, FileIcon, MoreHorizontal, Plus, Settings } from "lucide-react";
+import { Book, MoreHorizontal, Plus, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -42,6 +43,11 @@ async function getData(userId: string, siteId: string) {
       title: true,
       createdAt: true,
       id: true,
+      Site:{
+        select:{
+          subdirectory: true,
+        }
+      }
     },
     orderBy: {
       createdAt: "desc",
@@ -63,7 +69,7 @@ export default async function SiteIdRoute({
     <>
       <div className="flex w-full justify-end gap-x-2">
         <Button asChild variant="secondary">
-          <Link href={"/"}>
+          <Link href={`/blog/${data[0].Site?.subdirectory}`}>
             <Book className="size-6 mr-2" />
             View Blog
           </Link>
@@ -81,7 +87,7 @@ export default async function SiteIdRoute({
           </Link>
         </Button>
       </div>
-      {!data === undefined || data.length !== 0 ? (
+      {data === undefined || data.length !== 0 ? (
         <>
           <Card>
             <CardHeader>
@@ -163,15 +169,8 @@ export default async function SiteIdRoute({
             </CardContent>
           </Card>
         </>
-      ) : (
-        <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-8 text-center animate-in fade-in-50">
-          <div className="flex size-20 items-center justify-center rounded-full bg-primary/10">
-            <FileIcon className="size-10 text-primary" />
-          </div>
-          <h2 className="mt-6 text-xl font-semibold">
-            Nemáte vytvořené žádné articly
-          </h2>
-        </div>
+      ) : (        
+          <EmptyHeaderState headerText="Nemáte vytvořené žádné articly" />        
       )}
     </>
   );

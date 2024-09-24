@@ -2,15 +2,25 @@
 
 import { redirect } from "next/navigation";
 import { parseWithZod } from "@conform-to/zod";
-import { articleSchema, siteSchema } from "./utlis/zodSchemas";
+import { articleSchema, SiteCreationSchema, siteSchema } from "./utlis/zodSchemas";
 import prisma from "./utlis/db";
 import { requireUser } from "./utlis/requireUser";
 
 export async function CreateSiteAction(prevState: any, formData: FormData) {
   const user = await requireUser();
 
-  const submission = parseWithZod(formData, {
-    schema: siteSchema,
+  const submission = await parseWithZod(formData, {
+    schema: SiteCreationSchema({
+      async isSubdirectoryUnique() {
+          const existingSubDirectory = await prisma.site.findUnique({
+            where:{
+              subdirectory: formData.get('subdirectory') as string,
+            },
+          });
+          return !existingSubDirectory
+        },  
+    }),
+    async: true,
   });
 
   if (submission.status !== "success") {
@@ -106,3 +116,18 @@ export async function UpdateImage(formData: FormData) {
 
   return redirect(`/dashboard/sites/${formData.get("id")}`);
 }
+
+export async function DeleteSite(formData:FormData) {
+
+  const user = await requireUser();
+
+  const data = await prisma.site.delete({
+    where: {
+      userId: user.id,
+      id: formData.get("id") as string,
+    },
+  });
+
+  return redirect(`/dashboard/sites/`);
+}
+

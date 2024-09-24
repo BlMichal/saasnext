@@ -42,6 +42,6 @@ model Article {
   updateAt       DateTime @updatedAt
   userId         String?
   siteId         String?
-  Site           Site?    @relation(fields: [siteId], references: [id])
+  Site           Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
   User           User?    @relation(fields: [userId], references: [id])
 }
