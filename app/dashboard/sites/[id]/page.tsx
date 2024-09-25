@@ -31,28 +31,28 @@ import Image from "next/image";
 import Link from "next/link";
 
 async function getData(userId: string, siteId: string) {
-  const data = await prisma.article.findMany({
+
+  const data = await prisma.site.findUnique({
     where: {
+      id: siteId,
       userId: userId,
-      siteId: siteId,
     },
     select: {
-      image: true,
-      slug: true,
-      description: true,
-      title: true,
-      createdAt: true,
-      id: true,
-      Site:{
-        select:{
-          subdirectory: true,
-        }
-      }
-    },
-    orderBy: {
-      createdAt: "desc",
+      subdirectory: true,
+      Article: {
+        select: {
+          image: true,
+          title: true,
+          createdAt: true,
+          id: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
+  
   return data;
 }
 
@@ -69,7 +69,7 @@ export default async function SiteIdRoute({
     <>
       <div className="flex w-full justify-end gap-x-2">
         <Button asChild variant="secondary">
-          <Link href={`/blog/${data[0].Site?.subdirectory}`}>
+          <Link href={`/blog/${data?.subdirectory}`}>
             <Book className="size-6 mr-2" />
             View Blog
           </Link>
@@ -87,7 +87,7 @@ export default async function SiteIdRoute({
           </Link>
         </Button>
       </div>
-      {data === undefined || data.length !== 0 ? (
+      {data?.Article === undefined || data.Article.length !== 0 ? (
         <>
           <Card>
             <CardHeader>
@@ -106,8 +106,8 @@ export default async function SiteIdRoute({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.map((item) => (
-                    <>
+                  {data.Article.map((item) => (
+                   
                       <TableRow key={item.id}>
                         <TableCell>
                           <Image
@@ -162,7 +162,7 @@ export default async function SiteIdRoute({
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    </>
+                    
                   ))}
                 </TableBody>
               </Table>

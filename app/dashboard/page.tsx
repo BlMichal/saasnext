@@ -16,7 +16,7 @@ async function getData(userId: string) {
       orderBy: {
         createdAt: "desc",
       },
-      take: 4,
+      take: 3,
     }),
     prisma.article.findMany({
       where: {
@@ -64,8 +64,10 @@ const DashBoardPage = async () => {
               </CardFooter>
             </Card>
           ))}
+          
         </div>
       )}
+      <hr className="mt-8"/>
       <h1 className="text-2xl font-semibold my-5">Recent articles</h1>
       {article.length < 0 ? (
         <EmptyHeaderState headerText="Nebyli nalezeny žádné příspěvky." />
