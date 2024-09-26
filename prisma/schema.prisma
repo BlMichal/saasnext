@@ -14,6 +14,8 @@ model User {
   firstName    String
   profileImage String
   createdAt    DateTime  @default(now())
+  customerId String? @unique
+
   Article      Article[]
   Site         Site[]
 }
@@ -27,6 +29,7 @@ model Site {
   createdAt    DateTime  @default(now())
   updateAt     DateTime  @updatedAt
   userId       String?
+
   Article      Article[]
   User         User?     @relation(fields: [userId], references: [id])
 }
@@ -42,6 +45,7 @@ model Article {
   updateAt       DateTime @updatedAt
   userId         String?
   siteId         String?
+
   Site           Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
   User           User?    @relation(fields: [userId], references: [id])
 }

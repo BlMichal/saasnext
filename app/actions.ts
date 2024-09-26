@@ -5,6 +5,7 @@ import { parseWithZod } from "@conform-to/zod";
 import { articleSchema, SiteCreationSchema, siteSchema } from "./utlis/zodSchemas";
 import prisma from "./utlis/db";
 import { requireUser } from "./utlis/requireUser";
+import { stripe } from "./utlis/stripe";
 
 export async function CreateSiteAction(prevState: any, formData: FormData) {
   const user = await requireUser();
@@ -129,5 +130,51 @@ export async function DeleteSite(formData:FormData) {
   });
 
   return redirect(`/dashboard/sites/`);
+}
+
+export async function CreateSubscription(){
+  const user = await requireUser();
+
+  let stripeUserId = await prisma.user.findUnique({
+    where :{
+      id: user.id,
+    },
+    select:{
+      customerId: true,
+      email: true,
+      firstName: true,
+    },
+  });
+
+  if(!stripeUserId?.customerId){
+    const stripeCustomer = await stripe.customers.create({
+      email: stripeUserId?.email,
+      name:stripeUserId?.firstName,      
+    });
+
+    stripeUserId = await prisma.user.update({
+      where:{
+        id: user.id,
+      },
+      data: {
+        customerId: stripeCustomer.id,
+      },
+    });
+  }
+  const session = await stripe.checkout.sessions.create({
+    customer: stripeUserId.customerId as string,
+    mode: 'subscription',
+    billing_address_collection: 'auto',
+    payment_method_types: ['card'],
+    line_items: [{price: process.env.STRIPE_SUBS_STARTUP, quantity: 1}],
+    customer_update: {
+      address: 'auto',
+      name:'auto',
+    },
+    success_url: 'http://localhost:3000/dashboard/payment/sucess',
+    cancel_url: 'http://localhost:3000/dashboard/payment/cancelled',
+  })
+
+  return redirect(session.url as string);
 }
 
