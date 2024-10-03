@@ -9,29 +9,31 @@ datasource db {
 }
 
 model User {
-  id           String    @id @unique
+  id           String   @id @unique
   email        String
   firstName    String
   profileImage String
-  createdAt    DateTime  @default(now())
-  customerId String? @unique
+  createdAt    DateTime @default(now())
+  customerId   String?  @unique
 
-  Article      Article[]
-  Site         Site[]
+  Article Article[]
+  Site    Site[]
+
+  Subscription Subscription?
 }
 
 model Site {
-  id           String    @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
   description  String
   imageUrl     String?
-  subdirectory String    @unique
-  createdAt    DateTime  @default(now())
-  updateAt     DateTime  @updatedAt
+  subdirectory String   @unique
+  createdAt    DateTime @default(now())
+  updateAt     DateTime @updatedAt
   userId       String?
 
-  Article      Article[]
-  User         User?     @relation(fields: [userId], references: [id])
+  Article Article[]
+  User    User?     @relation(fields: [userId], references: [id])
 }
 
 model Article {
@@ -46,6 +48,20 @@ model Article {
   userId         String?
   siteId         String?
 
-  Site           Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  User           User?    @relation(fields: [userId], references: [id])
+  Site Site? @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  User User? @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id                 String   @id @unique
+  interval           String
+  status             String
+  planId             String
+  currentPeriodStart Int
+  currentPeriodEnd   Int
+  createdAt          DateTime @default(now())
+  updateAt           DateTime @updatedAt
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String? @unique
 }

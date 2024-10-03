@@ -2,7 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { parseWithZod } from "@conform-to/zod";
-import { articleSchema, SiteCreationSchema, siteSchema } from "./utlis/zodSchemas";
+import {
+  articleSchema,
+  SiteCreationSchema,  
+} from "./utlis/zodSchemas";
 import prisma from "./utlis/db";
 import { requireUser } from "./utlis/requireUser";
 import { stripe } from "./utlis/stripe";
@@ -10,33 +13,62 @@ import { stripe } from "./utlis/stripe";
 export async function CreateSiteAction(prevState: any, formData: FormData) {
   const user = await requireUser();
 
-  const submission = await parseWithZod(formData, {
-    schema: SiteCreationSchema({
-      async isSubdirectoryUnique() {
-          const existingSubDirectory = await prisma.site.findUnique({
-            where:{
-              subdirectory: formData.get('subdirectory') as string,
-            },
-          });
-          return !existingSubDirectory
-        },  
+  const [subStatus, sites] = await Promise.all([
+    prisma.subscription.findUnique({
+      where: {
+        userId: user.id,
+      },
+      select: {
+        status: true,
+      },
     }),
-    async: true,
-  });
+    prisma.site.findMany({
+      where: {
+        userId: user.id,
+      },
+    }),
+  ]);
 
-  if (submission.status !== "success") {
-    return submission.reply();
+  if (!subStatus || subStatus.status !== "active") {
+    // One sites for not sub. users
+    if (sites.length < 1) {
+     await createSite();
+    } else {
+      return redirect("/dashboard/pricing");
+    }
+  } else if (subStatus.status === "active") {
+   await createSite();
   }
 
-  const response = await prisma.site.create({
-    data: {
-      name: submission.value.name,
-      subdirectory: submission.value.subdirectory,
-      description: submission.value.description,
-      userId: user.id,
-    },
-  });
+  async function createSite() {
+    const submission = await parseWithZod(formData, {
+      schema: SiteCreationSchema({
+        async isSubdirectoryUnique() {
+          const existingSubDirectory = await prisma.site.findUnique({
+            where: {
+              subdirectory: formData.get("subdirectory") as string,
+            },
+          });
+          return !existingSubDirectory;
+        },
+      }),
+      async: true,
+    });
 
+    if (submission.status !== "success") {
+      return submission.reply();
+    }
+
+    const response = await prisma.site.create({
+      data: {
+        name: submission.value.name,
+        subdirectory: submission.value.subdirectory,
+        description: submission.value.description,
+        userId: user.id,
+      },
+    });
+
+  }
   return redirect("/dashboard/sites/");
 }
 
@@ -118,8 +150,7 @@ export async function UpdateImage(formData: FormData) {
   return redirect(`/dashboard/sites/${formData.get("id")}`);
 }
 
-export async function DeleteSite(formData:FormData) {
-
+export async function DeleteSite(formData: FormData) {
   const user = await requireUser();
 
   const data = await prisma.site.delete({
@@ -132,28 +163,28 @@ export async function DeleteSite(formData:FormData) {
   return redirect(`/dashboard/sites/`);
 }
 
-export async function CreateSubscription(){
+export async function CreateSubscription() {
   const user = await requireUser();
 
   let stripeUserId = await prisma.user.findUnique({
-    where :{
+    where: {
       id: user.id,
     },
-    select:{
+    select: {
       customerId: true,
       email: true,
       firstName: true,
     },
   });
 
-  if(!stripeUserId?.customerId){
+  if (!stripeUserId?.customerId) {
     const stripeCustomer = await stripe.customers.create({
       email: stripeUserId?.email,
-      name:stripeUserId?.firstName,      
+      name: stripeUserId?.firstName,
     });
 
     stripeUserId = await prisma.user.update({
-      where:{
+      where: {
         id: user.id,
       },
       data: {
@@ -161,20 +192,20 @@ export async function CreateSubscription(){
       },
     });
   }
+
   const session = await stripe.checkout.sessions.create({
     customer: stripeUserId.customerId as string,
-    mode: 'subscription',
-    billing_address_collection: 'auto',
-    payment_method_types: ['card'],
-    line_items: [{price: process.env.STRIPE_SUBS_STARTUP, quantity: 1}],
+    mode: "subscription",
+    billing_address_collection: "auto",
+    payment_method_types: ["card"],
+    line_items: [{ price: process.env.STRIPE_SUBS_STARTUP, quantity: 1 }],
     customer_update: {
-      address: 'auto',
-      name:'auto',
+      address: "auto",
+      name: "auto",
     },
-    success_url: 'http://localhost:3000/dashboard/payment/sucess',
-    cancel_url: 'http://localhost:3000/dashboard/payment/cancelled',
-  })
+    success_url: "http://localhost:3000/dashboard/payment/success",
+    cancel_url: "http://localhost:3000/dashboard/payment/cancelled",
+  });
 
   return redirect(session.url as string);
 }
-

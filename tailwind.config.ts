@@ -20,6 +20,9 @@ const config = {
       },
     },
     extend: {
+      fontSize: {
+        'responsive': 'clamp(3rem, 5vw, 6rem)' 
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

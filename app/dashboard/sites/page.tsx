@@ -31,7 +31,7 @@ export default async function SitesPage() {
 
   const data = await getData(user.id);
 
-  console.log(data)
+  
   return (
     <>
       <div className="flex w-full justify-end">

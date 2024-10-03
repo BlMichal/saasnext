@@ -51,9 +51,8 @@ async function getData(userId: string, siteId: string) {
         },
       },
     },
-  });
-  
-  return data;
+  });   
+    return data;
 }
 
 export default async function SiteIdRoute({
@@ -65,6 +64,11 @@ export default async function SiteIdRoute({
 
   const data = await getData(user.id, params.id);
 
+  if(!data){
+    return <div>loading</div>
+  }
+
+  
   return (
     <>
       <div className="flex w-full justify-end gap-x-2">
@@ -87,7 +91,7 @@ export default async function SiteIdRoute({
           </Link>
         </Button>
       </div>
-      {data?.Article === undefined || data.Article.length !== 0 ? (
+      {data?.Article == undefined || data.Article.length !== 0 ? (
         <>
           <Card>
             <CardHeader>
@@ -106,8 +110,7 @@ export default async function SiteIdRoute({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.Article.map((item) => (
-                   
+                  {data.Article.map((item) => (                   
                       <TableRow key={item.id}>
                         <TableCell>
                           <Image
